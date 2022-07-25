@@ -1,0 +1,7 @@
+<div
+  *ngFor="let item of list; let $last = last"
+  [exist]="$last"
+  (ngInit)="cssCreate()"
+>
+  <app-item [itemList]="item"></app-item>
+</div>
