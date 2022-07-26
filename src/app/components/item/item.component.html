@@ -1,6 +1,67 @@
 <div
-  [ngClass]="checkForClass()"
-  class="bef p-3 d-flex flex-wrap justify-content-evenly"
+  [ngClass]="checkForClass('bg')"
+  class="bef p-3 m-3 d-flex flex-wrap flex-column flex-md-row justify-content-evenly align-items-center"
 >
-  <p [innerHTML]="itemList.item | safeHtml"></p>
+  <p
+    *ngIf="inputActive === false"
+    [innerHTML]="itemList.item | safeHtml"
+    class="m-0"
+    (click)="inputActiveChange()"
+  ></p>
+  <textarea
+    *ngIf="inputActive === true"
+    type="text"
+    name="item"
+    #item="ngModel"
+    [(ngModel)]="itemList.item"
+    class="form-control"
+    id="exampleFormControlInput1"
+    placeholder="{{ itemList.item }}"
+    (keyup.enter)="changeType(itemList.item, 'item')"
+  ></textarea>
+
+  <div class="btn-group bef bef-mt-1_5rem bef-mt-md-0" dropdown>
+    <button
+      id="button-animated"
+      dropdownToggle
+      type="button"
+      class="btn bef dropdown-toggle bef-boxShadow-0px__0px__8px__dark"
+      [ngClass]="checkForClass('btn')"
+      aria-controls="dropdown-animated"
+    >
+      Change type<span class="caret"></span>
+    </button>
+    <ul
+      id="dropdown-animated"
+      *dropdownMenu
+      class="dropdown-menu p-0"
+      role="menu"
+      aria-labelledby="button-animated"
+    >
+      <li role="menuitem">
+        <button
+          class="btn btn-success w-100"
+          (click)="changeType('checked', 'type')"
+        >
+          Checked
+        </button>
+      </li>
+      <li role="menuitem">
+        <button
+          class="btn btn-light w-100"
+          (click)="changeType('not-checked', 'type')"
+        >
+          Not Checked
+        </button>
+      </li>
+      <li role="menuitem">
+        <button
+          class="btn btn-warning w-100"
+          (click)="changeType('option 3', 'type')"
+        >
+          Option 3
+        </button>
+      </li>
+    </ul>
+  </div>
 </div>

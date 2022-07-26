@@ -40,4 +40,9 @@ export class ListComponent implements OnInit {
   cssCreate() {
     this._befService.cssCreate();
   }
+
+  changeTypeO(change: any) {
+    console.log(change);
+    this.list[change.i] = change.item;
+  }
 }

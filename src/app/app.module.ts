@@ -1,10 +1,16 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 
-/* BEFService */
+/* BefService */
 import { NgxBootstrapExpandedFeaturesService as BefService } from 'ngx-bootstrap-expanded-features';
+
+/* NGX-Bootstrap */
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { TooltipModule } from 'ngx-bootstrap/tooltip';
 
 /* Components */
 import { AppComponent } from './app.component';
@@ -29,7 +35,15 @@ import { SafeHtmlPipe } from './pipes/safe-html';
     /* Pipes */
     SafeHtmlPipe,
   ],
-  imports: [BrowserModule, AppRoutingModule],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    FormsModule,
+    ReactiveFormsModule,
+    BrowserAnimationsModule,
+    BsDropdownModule.forRoot(),
+    TooltipModule.forRoot(),
+  ],
   providers: [BefService],
   bootstrap: [AppComponent],
 })
