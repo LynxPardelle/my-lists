@@ -1,6 +1,8 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+
+/* Interfaces */
 import itemListInterface from '../interfaces/itemList';
-import { Output, EventEmitter } from '@angular/core';
+import optionInterface from '../interfaces/option';
 
 /* NGX-Bootstrap */
 import { BsDropdownConfig } from 'ngx-bootstrap/dropdown';
@@ -21,29 +23,24 @@ import { NgxBootstrapExpandedFeaturesService as BefService } from 'ngx-bootstrap
 })
 export class ItemComponent implements OnInit {
   public inputActive: boolean = false;
-  @Input() itemList!: itemListInterface;
-  @Input() itemIndex!: number;
+  @Input() itemList: itemListInterface = {
+    item: '',
+    type: 1,
+  };
+  @Input() itemIndex: number = 0;
+  @Input() options: optionInterface[] = [];
 
   @Output() changeTypeEvent = new EventEmitter<any>();
   constructor(private _befService: BefService) {}
 
   ngOnInit(): void {}
 
-  checkForClass(property: string) {
-    let type: string = 'success';
-    switch (this.itemList.type) {
-      case 'checked':
-        type = 'success';
-        break;
-      case 'not-checked':
-        type = 'light';
-        break;
-      case 'option 3':
-        type = 'warning';
-        break;
-      case 'option 4':
-        type = 'danger';
-        break;
+  checkForClass(property: string, thing: string) {
+    let type: string = '';
+    if (thing === 'item') {
+      type = this.options[this.itemList.type].color;
+    } else if (thing.includes('type')) {
+      type = this.options[Number.parseInt(thing.split('_')[1])].color;
     }
     let bgType = { 'bef-PROPERTY-TYPE__OPA__0_33': true };
     bgType = JSON.parse(
@@ -52,12 +49,12 @@ export class ItemComponent implements OnInit {
     return bgType;
   }
 
-  changeType(thing: string, option: string) {
+  changeInfo(thing: string | number, option: string) {
     let type = this.itemList.type;
     let item = this.itemList.item;
-    if (option === 'type') {
+    if (option === 'type' && typeof thing === 'number') {
       type = thing;
-    } else {
+    } else if (option === 'item' && typeof thing === 'string') {
       item = thing;
     }
     this.changeTypeEvent.emit({

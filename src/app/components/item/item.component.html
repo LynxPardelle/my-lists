@@ -1,11 +1,11 @@
 <div
-  [ngClass]="checkForClass('bg')"
-  class="bef p-3 m-3 d-flex flex-wrap flex-column flex-md-row justify-content-evenly align-items-center"
+  [ngClass]="checkForClass('bg', 'item')"
+  class="bef p-3 m-3 d-flex flex-wrap flex-column flex-md-row justify-content-evenly align-items-center bef-rounded-1rem"
 >
   <p
     *ngIf="inputActive === false"
     [innerHTML]="itemList.item | safeHtml"
-    class="m-0"
+    class="m-0 bef bef-w-90per bef-w-md-70per"
     (click)="inputActiveChange()"
   ></p>
   <textarea
@@ -14,54 +14,61 @@
     name="item"
     #item="ngModel"
     [(ngModel)]="itemList.item"
-    class="form-control"
+    class="form-control bef bef-w-90per bef-w-md-70per"
     id="exampleFormControlInput1"
     placeholder="{{ itemList.item }}"
-    (keyup.enter)="changeType(itemList.item, 'item')"
+    (keyup.enter)="changeInfo(itemList.item, 'item')"
   ></textarea>
 
-  <div class="btn-group bef bef-mt-1_5rem bef-mt-md-0" dropdown>
+  <div
+    class="btn-group bef bef-mt-1_5rem bef-mt-md-0 bef bef-w-66per bef-w-md-20per"
+    dropdown
+    placement="bottom right"
+  >
     <button
       id="button-animated"
       dropdownToggle
       type="button"
-      class="btn bef dropdown-toggle bef-boxShadow-0px__0px__8px__dark"
-      [ngClass]="checkForClass('btn')"
+      class="btn bef dropdown-toggle bef-boxShadow-0px__0px__8px__dark w-100"
+      [ngClass]="checkForClass('btn', 'type_' + itemList.type)"
       aria-controls="dropdown-animated"
     >
-      Change type<span class="caret"></span>
+      <ng-container *ngIf="itemList.type < 0; else elseTemplate">
+        Choose a type
+      </ng-container>
+      <ng-template #elseTemplate>
+        {{ options[itemList.type].option }}
+      </ng-template>
+      <span class="caret"></span>
     </button>
     <ul
       id="dropdown-animated"
       *dropdownMenu
-      class="dropdown-menu p-0"
+      class="dropdown-menu p-0 w-100"
       role="menu"
       aria-labelledby="button-animated"
     >
-      <li role="menuitem">
+      <li
+        *ngFor="let option of options; let ix = index; let $last = last"
+        [exist]="$last"
+        (ngInit)="cssCreate()"
+        role="menuitem"
+      >
         <button
-          class="btn btn-success w-100"
-          (click)="changeType('checked', 'type')"
+          [ngClass]="checkForClass('btn', 'type_' + ix)"
+          class="btn bef w-100"
+          (click)="changeInfo(ix, 'type')"
         >
-          Checked
-        </button>
-      </li>
-      <li role="menuitem">
-        <button
-          class="btn btn-light w-100"
-          (click)="changeType('not-checked', 'type')"
-        >
-          Not Checked
-        </button>
-      </li>
-      <li role="menuitem">
-        <button
-          class="btn btn-warning w-100"
-          (click)="changeType('option 3', 'type')"
-        >
-          Option 3
+          <span [ngClass]="{ 'text-dark': !option.color.includes('dark') }">
+            {{ option.option }}
+          </span>
         </button>
       </li>
     </ul>
   </div>
 </div>
+<p *ngIf="inputActive === true" class="text-center">
+  Press "Enter" to Send.
+  <br />
+  If the item is empty it will be deleted.
+</p>

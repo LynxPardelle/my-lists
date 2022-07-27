@@ -1,7 +1,96 @@
-<div
+<h1 class="text-center my-3">Simple Lists</h1>
+<h2 class="text-center my-3">Your List</h2>
+<section
   *ngFor="let item of list; let i = index; let $last = last"
   [exist]="$last"
   (ngInit)="cssCreate()"
 >
-  <app-item [itemList]="item" [itemIndex]="i" (changeTypeEvent)="changeTypeO($event)"></app-item>
-</div>
+  <app-item
+    [itemList]="item"
+    [itemIndex]="i"
+    [options]="options"
+    (changeTypeEvent)="changeInfoO($event)"
+  ></app-item>
+</section>
+<h3 class="text-center">Create New Item</h3>
+<section
+  [ngClass]="checkForClass('bg', 'item')"
+  class="bef p-3 m-3 d-flex flex-wrap flex-column flex-md-row justify-content-evenly align-items-center bef-rounded-1rem"
+>
+  <textarea
+    type="text"
+    name="item"
+    #item="ngModel"
+    [(ngModel)]="newItem.item"
+    class="form-control bef bef-w-90per bef-w-md-70per"
+    id="exampleFormControlInput1"
+    placeholder="{{ newItem.item }}"
+    (keyup.enter)="createNewItem()"
+  ></textarea>
+
+  <div
+    class="btn-group bef bef-mt-1_5rem bef-mt-md-0 bef bef-w-66per bef-w-md-20per"
+    dropdown
+    placement="bottom right"
+  >
+    <button
+      id="button-animated"
+      dropdownToggle
+      type="button"
+      class="btn bef dropdown-toggle bef-boxShadow-0px__0px__8px__dark w-100"
+      [ngClass]="checkForClass('btn', 'type_' + newItem.type)"
+      aria-controls="dropdown-animated"
+    >
+      <ng-container *ngIf="newItem.type < 0; else elseTemplate">
+        Choose a type
+      </ng-container>
+      <ng-template #elseTemplate>
+        {{ options[newItem.type].option }}
+      </ng-template>
+      <span class="caret"></span>
+    </button>
+    <ul
+      id="dropdown-animated"
+      *dropdownMenu
+      class="dropdown-menu p-0 w-100"
+      role="menu"
+      aria-labelledby="button-animated"
+    >
+      <li
+        *ngFor="let option of options; let ix = index; let $last = last"
+        [exist]="$last"
+        (ngInit)="cssCreate()"
+        role="menuitem"
+      >
+        <button
+          [ngClass]="checkForClass('btn', 'type_' + ix)"
+          class="btn bef w-100"
+          (click)="changeInfo(ix, 'type')"
+        >
+          <span [ngClass]="{ 'text-dark': !option.color.includes('dark') }">
+            {{ option.option }}
+          </span>
+        </button>
+      </li>
+    </ul>
+  </div>
+</section>
+<p *ngIf="newItem.item !== ''" class="text-center">
+  Press "Enter" to Send.
+  <br />
+  If the item is empty it will not be created.
+</p>
+<!--
+<h2 class="text-center my-3">Your Types</h2>
+<section
+  *ngFor="let option of options; let i = index; let $last = last"
+  [exist]="$last"
+  (ngInit)="cssCreate()"
+>
+  <app-item
+    [itemList]="option"
+    [itemIndex]="i"
+    [options]="basicColors"
+    (changeTypeEvent)="changeInfoO($event)"
+  ></app-item>
+</section> -->
