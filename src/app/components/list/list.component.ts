@@ -6,6 +6,7 @@ import optionInterface from '../interfaces/option';
 
 /* BEFService */
 import { NgxBootstrapExpandedFeaturesService as BefService } from 'ngx-bootstrap-expanded-features';
+import { throwError } from 'rxjs';
 @Component({
   selector: 'app-list',
   templateUrl: './list.component.html',
@@ -89,6 +90,12 @@ export class ListComponent implements OnInit {
   };
 
   public savedLists: string = '';
+
+  public saveLists: { saveList: string } = {
+    saveList: '',
+  };
+
+  public errorMessage: string = '';
 
   constructor(private _befService: BefService) {
     this._befService.cssCreate();
@@ -212,15 +219,43 @@ export class ListComponent implements OnInit {
   }
 
   restoreLists() {
-    let myLists: any = this.savedLists;
-    if (myLists !== null) {
-      myLists = JSON.parse(myLists);
-      if (myLists !== undefined) {
-        this.list = myLists.list;
-        this.options = myLists.options;
-        this.basicColors = myLists.basicColors;
-        this.savedLists = JSON.stringify(myLists);
-        this.saveList();
+    let myLists: any = this.saveLists.saveList;
+    if (myLists !== '') {
+      try {
+        myLists = JSON.parse(myLists);
+        console.log(myLists.list);
+        console.log(myLists.options);
+        console.log(myLists.basicColors);
+        if (
+          myLists !== undefined &&
+          myLists.list &&
+          myLists.list[0] &&
+          myLists.list[0].item &&
+          typeof myLists.list[0].item === 'string' &&
+          myLists.list[0].type &&
+          typeof myLists.list[0].type === 'number' &&
+          myLists.options &&
+          myLists.options[0] &&
+          myLists.options[0].option &&
+          typeof myLists.options[0].option === 'string' &&
+          myLists.options[0].color &&
+          typeof myLists.options[0].color === 'string' &&
+          myLists.basicColors &&
+          myLists.basicColors[0]
+        ) {
+          this.list = myLists.list;
+          this.options = myLists.options;
+          this.basicColors = myLists.basicColors;
+          this.savedLists = JSON.stringify(myLists);
+          this.saveList();
+          this.errorMessage = 'Data retrieved successfully';
+        } else {
+          throw new Error('Error de JSON parse');
+        }
+      } catch (error) {
+        console.log(error);
+        this.errorMessage =
+          'No se ha podido importar la lista, revisa los datos porfavor.';
       }
     }
   }

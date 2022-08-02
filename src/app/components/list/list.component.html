@@ -162,19 +162,37 @@
   <br />
   If the item is empty it will not be created.
 </p>
-<h2 class="text-center my-3">Export/Import Lists</h2>
+<h2 class="text-center mt-5 mb-3">Export/Import Lists</h2>
 <section>
+  <p *ngIf="savedLists !== ''" class="text-center my-3">
+    Copy the follow code so you can write it on the input below on another
+    device.
+    <!-- Copia el siguiente código y escríbelo abajo en donde lo quieras importar: -->
+  </p>
   <p *ngIf="savedLists !== ''" class="w-75 p-4 text-break text-center mx-auto">
     {{ savedLists }}
   </p>
-  <!-- <textarea
+  <p class="text-center my-3">
+    Write the code of your saved list and send it.
+    <!-- Escribe el código que quieras importar aquí y envíalo. -->
+  </p>
+  <textarea
     type="text"
-    name="savedLists"
-    #savedLists="ngModel"
-    [(ngModel)]="savedLists"
+    name="saveList"
+    #saveList="ngModel"
+    [(ngModel)]="saveLists.saveList"
     class="form-control w-75 p-4 text-break text-center mx-auto"
-    id="savedLists"
-    placeholder="{{ savedLists }}"
-    (keyup.enter)="restoreLists()"
-  ></textarea> -->
+    id="saveList"
+    placeholder="{{ saveLists.saveList }}"
+  ></textarea>
+  <p class="text-center text-danger my-5" *ngIf="errorMessage !== ''">
+    {{ errorMessage }}
+  </p>
+  <button
+    class="btn btn-info d-block mx-auto mt-3 mb-5"
+    [disabled]="saveLists.saveList === ''"
+    (click)="restoreLists()"
+  >
+    Send
+  </button>
 </section>
