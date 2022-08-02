@@ -40,14 +40,14 @@ export class ListComponent implements OnInit {
       option: 'not-checked',
       color: 'secondary',
     },
-    /* {
-      option: 'option 3',
+    {
+      option: 'almost checked',
       color: 'warning',
     },
     {
-      option: 'option 4',
+      option: 'dont check',
       color: 'danger',
-    }, */
+    },
   ];
 
   public basicColors: string[] = [
@@ -83,18 +83,43 @@ export class ListComponent implements OnInit {
     type: 1,
   };
 
+  public newOption: optionInterface = {
+    option: '',
+    color: '',
+  };
+
+  public savedLists: string = '';
+
   constructor(private _befService: BefService) {
     this._befService.cssCreate();
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.getList();
+  }
 
-  checkForClass(property: string, thing: string) {
+  getColorIndex(color: string) {
+    return this.basicColors.indexOf(color);
+  }
+
+  checkForClass(property: string, thing: string, option: string = 'item') {
     let type: string = '';
-    if (thing === 'item') {
-      type = this.options[this.newItem.type].color;
-    } else if (thing.includes('type')) {
-      type = this.options[Number.parseInt(thing.split('_')[1])].color;
+    if (option === 'item') {
+      if (thing === 'item') {
+        type = this.options[this.newItem.type].color;
+      } else if (thing.includes('type')) {
+        type = this.options[Number.parseInt(thing.split('_')[1])].color;
+      }
+    } else {
+      if (thing === 'option') {
+        if (this.newOption.color !== '') {
+          type = this.newOption.color;
+        } else {
+          type = 'dark';
+        }
+      } else if (thing.includes('color')) {
+        type = this.basicColors[this.getColorIndex(thing.split('_')[1])];
+      }
     }
 
     let bgType = { 'bef-PROPERTY-TYPE__OPA__0_33': true };
@@ -110,6 +135,8 @@ export class ListComponent implements OnInit {
       this.newItem.type = thing;
     } else if (option === 'item' && typeof thing === 'string') {
       this.newItem.item = thing;
+    } else if (option === 'color' && typeof thing === 'string') {
+      this.newOption.color = thing;
     }
   }
 
@@ -118,19 +145,26 @@ export class ListComponent implements OnInit {
   }
 
   changeInfoO(change: any) {
-    if (change.item.item) {
+    console.log(change);
+    if (change.item) {
       if (change.item.item !== '' && change.item.item !== '\n') {
         this.list[change.i] = change.item;
       } else {
         this.list.splice(change.i, 1);
       }
-    } else if (change.item.option) {
-      if (change.item.option !== '' && change.item.option !== '\n') {
+    } else if (change.option) {
+      if (change.option.option !== '' && change.option.option !== '\n') {
         this.options[change.i] = change.option;
       } else {
+        for (let itemList of this.list) {
+          if (itemList.type === change.i) {
+            itemList.type = -1;
+          }
+        }
         this.options.splice(change.i, 1);
       }
     }
+    this.saveList();
   }
 
   createNewItem() {
@@ -140,6 +174,54 @@ export class ListComponent implements OnInit {
         item: '',
         type: 1,
       };
+      this.saveList();
+    }
+  }
+
+  createNewOption() {
+    if (this.newOption.option !== '') {
+      this.options.push(this.newOption);
+      this.newOption = {
+        option: '',
+        color: '',
+      };
+      this.saveList();
+    }
+  }
+
+  saveList() {
+    let simpleLists = {
+      list: this.list,
+      options: this.options,
+      basicColors: this.basicColors,
+    };
+    localStorage.setItem('SimpleLists', JSON.stringify(simpleLists));
+  }
+
+  getList() {
+    let simpleLists: any = localStorage.getItem('SimpleLists');
+    if (simpleLists !== null) {
+      simpleLists = JSON.parse(simpleLists);
+      if (simpleLists !== undefined) {
+        this.list = simpleLists.list;
+        this.options = simpleLists.options;
+        this.basicColors = simpleLists.basicColors;
+        this.savedLists = JSON.stringify(simpleLists);
+      }
+    }
+  }
+
+  restoreLists() {
+    let simpleLists: any = this.savedLists;
+    if (simpleLists !== null) {
+      simpleLists = JSON.parse(simpleLists);
+      if (simpleLists !== undefined) {
+        this.list = simpleLists.list;
+        this.options = simpleLists.options;
+        this.basicColors = simpleLists.basicColors;
+        this.savedLists = JSON.stringify(simpleLists);
+        this.saveList();
+      }
     }
   }
 }

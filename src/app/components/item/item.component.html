@@ -1,15 +1,37 @@
 <div
-  [ngClass]="checkForClass('bg', 'item')"
+  [ngClass]="
+    checkIfItemListInterface(itemList)
+      ? checkForClass('bg', 'item')
+      : !checkIfItemListInterface(itemList)
+      ? checkForClass('bg', 'option')
+      : {}
+  "
   class="bef p-3 m-3 d-flex flex-wrap flex-column flex-md-row justify-content-evenly align-items-center bef-rounded-1rem"
 >
-  <p
+  <div
     *ngIf="inputActive === false"
-    [innerHTML]="itemList.item | safeHtml"
-    class="m-0 bef bef-w-90per bef-w-md-70per"
+    [innerHTML]="
+      checkIfItemListInterface(itemList)
+        ? changeSomething(itemList.item)
+        : !checkIfItemListInterface(itemList)
+        ? itemList.option
+        : ('' | safeHtml)
+    "
+    class="m-0 bef bef-w-90per bef-w-md-70per text-center"
+    [ngClass]="{
+      'text-light':
+        (checkIfItemListInterface(itemList) &&
+          checkIfOptionInterface(options) &&
+          (itemList.type < 0 ||
+            options[itemList.type].color.includes('dark'))) ||
+        (!checkIfItemListInterface(itemList) &&
+          !checkIfOptionInterface(options) &&
+          options[getColorIndex(itemList.color)].includes('dark'))
+    }"
     (click)="inputActiveChange()"
-  ></p>
+  ></div>
   <textarea
-    *ngIf="inputActive === true"
+    *ngIf="inputActive === true && checkIfItemListInterface(itemList)"
     type="text"
     name="item"
     #item="ngModel"
@@ -18,6 +40,17 @@
     id="exampleFormControlInput1"
     placeholder="{{ itemList.item }}"
     (keyup.enter)="changeInfo(itemList.item, 'item')"
+  ></textarea>
+  <textarea
+    *ngIf="inputActive === true && !checkIfItemListInterface(itemList)"
+    type="text"
+    name="item"
+    #item="ngModel"
+    [(ngModel)]="itemList.option"
+    class="form-control bef bef-w-90per bef-w-md-70per"
+    id="exampleFormControlInput1"
+    placeholder="{{ itemList.option }}"
+    (keyup.enter)="changeInfo(itemList.option, 'option')"
   ></textarea>
 
   <div
@@ -30,16 +63,65 @@
       dropdownToggle
       type="button"
       class="btn bef dropdown-toggle bef-boxShadow-0px__0px__8px__dark w-100"
-      [ngClass]="checkForClass('btn', 'type_' + itemList.type)"
+      [ngClass]="
+        checkIfItemListInterface(itemList)
+          ? checkForClass('btn', 'item')
+          : !checkIfItemListInterface(itemList)
+          ? checkForClass('btn', 'color_' + getColorIndex(itemList.color))
+          : {}
+      "
       aria-controls="dropdown-animated"
     >
-      <ng-container *ngIf="itemList.type < 0; else elseTemplate">
-        Choose a type
-      </ng-container>
-      <ng-template #elseTemplate>
-        {{ options[itemList.type].option }}
-      </ng-template>
-      <span class="caret"></span>
+      <span
+        [ngClass]="{
+          'text-light':
+            (checkIfItemListInterface(itemList) &&
+              checkIfOptionInterface(options) &&
+              (itemList.type < 0 ||
+                options[itemList.type].color.includes('dark'))) ||
+            (!checkIfItemListInterface(itemList) &&
+              !checkIfOptionInterface(options) &&
+              options[getColorIndex(itemList.color)].includes('dark'))
+        }"
+      >
+        <ng-container
+          *ngIf="
+            (checkIfItemListInterface(itemList) && itemList.type < 0) ||
+              (!checkIfItemListInterface(itemList) && itemList.color === '');
+            else elseChooseTemplate
+          "
+        >
+          Choose a
+          <ng-container
+            *ngIf="
+              checkIfItemListInterface(itemList);
+              else elseNotChooseTemplate
+            "
+          >
+            type
+          </ng-container>
+          <ng-template #elseNotChooseTemplate> color </ng-template>
+        </ng-container>
+        <ng-template #elseChooseTemplate>
+          <ng-container
+            *ngIf="
+              checkIfItemListInterface(itemList) &&
+                checkIfOptionInterface(options);
+              else elseYesChooseTemplate
+            "
+          >
+            {{ options[itemList.type].option }}
+          </ng-container>
+          <ng-template #elseYesChooseTemplate>
+            {{
+              !checkIfItemListInterface(itemList)
+                ? options[getColorIndex(itemList.color)]
+                : ""
+            }}
+          </ng-template>
+        </ng-template>
+        <span class="caret"></span>
+      </span>
     </button>
     <ul
       id="dropdown-animated"
@@ -48,22 +130,54 @@
       role="menu"
       aria-labelledby="button-animated"
     >
-      <li
-        *ngFor="let option of options; let ix = index; let $last = last"
-        [exist]="$last"
-        (ngInit)="cssCreate()"
-        role="menuitem"
+      <ng-container
+        *ngIf="
+          checkIfItemListInterface(itemList) && checkIfOptionInterface(options);
+          else elseOptionsToChooseTemplate
+        "
       >
-        <button
-          [ngClass]="checkForClass('btn', 'type_' + ix)"
-          class="btn bef w-100"
-          (click)="changeInfo(ix, 'type')"
+        <li
+          *ngFor="let option of options; let ix = index; let $last = last"
+          [exist]="$last"
+          (ngInit)="cssCreate()"
+          role="menuitem"
         >
-          <span [ngClass]="{ 'text-dark': !option.color.includes('dark') }">
-            {{ option.option }}
-          </span>
-        </button>
-      </li>
+          <button
+            [ngClass]="checkForClass('btn', 'type_' + ix)"
+            class="btn bef w-100"
+            (click)="changeInfo(ix, 'type')"
+          >
+            <span [ngClass]="{ 'text-dark': !option.color.includes('dark') }">
+              {{ option.option }}
+            </span>
+          </button>
+        </li>
+      </ng-container>
+      <ng-template #elseOptionsToChooseTemplate>
+        <ng-container
+          *ngIf="
+            !checkIfItemListInterface(itemList) &&
+            !checkIfOptionInterface(options)
+          "
+        >
+          <li
+            *ngFor="let option of options; let ix = index; let $last = last"
+            [exist]="$last"
+            (ngInit)="cssCreate()"
+            role="menuitem"
+          >
+            <button
+              [ngClass]="checkForClass('btn', 'color_' + ix)"
+              class="btn bef w-100"
+              (click)="changeInfo(option, 'color')"
+            >
+              <span [ngClass]="{ 'text-dark': !option.includes('dark') }">
+                {{ option }}
+              </span>
+            </button>
+          </li>
+        </ng-container>
+      </ng-template>
     </ul>
   </div>
 </div>
