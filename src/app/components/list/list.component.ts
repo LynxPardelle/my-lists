@@ -190,36 +190,36 @@ export class ListComponent implements OnInit {
   }
 
   saveList() {
-    let simpleLists = {
+    let myLists = {
       list: this.list,
       options: this.options,
       basicColors: this.basicColors,
     };
-    localStorage.setItem('SimpleLists', JSON.stringify(simpleLists));
+    localStorage.setItem('MyLists', JSON.stringify(myLists));
   }
 
   getList() {
-    let simpleLists: any = localStorage.getItem('SimpleLists');
-    if (simpleLists !== null) {
-      simpleLists = JSON.parse(simpleLists);
-      if (simpleLists !== undefined) {
-        this.list = simpleLists.list;
-        this.options = simpleLists.options;
-        this.basicColors = simpleLists.basicColors;
-        this.savedLists = JSON.stringify(simpleLists);
+    let myLists: any = localStorage.getItem('MyLists');
+    if (myLists !== null) {
+      myLists = JSON.parse(myLists);
+      if (myLists !== undefined) {
+        this.list = myLists.list;
+        this.options = myLists.options;
+        this.basicColors = myLists.basicColors;
+        this.savedLists = JSON.stringify(myLists);
       }
     }
   }
 
   restoreLists() {
-    let simpleLists: any = this.savedLists;
-    if (simpleLists !== null) {
-      simpleLists = JSON.parse(simpleLists);
-      if (simpleLists !== undefined) {
-        this.list = simpleLists.list;
-        this.options = simpleLists.options;
-        this.basicColors = simpleLists.basicColors;
-        this.savedLists = JSON.stringify(simpleLists);
+    let myLists: any = this.savedLists;
+    if (myLists !== null) {
+      myLists = JSON.parse(myLists);
+      if (myLists !== undefined) {
+        this.list = myLists.list;
+        this.options = myLists.options;
+        this.basicColors = myLists.basicColors;
+        this.savedLists = JSON.stringify(myLists);
         this.saveList();
       }
     }
