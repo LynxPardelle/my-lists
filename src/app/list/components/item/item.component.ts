@@ -1,20 +1,19 @@
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 
 /* Interfaces */
-import itemListInterface from '../interfaces/itemList';
-import optionInterface from '../interfaces/option';
+import itemListInterface from '../../interfaces/itemList';
+import optionInterface from '../../interfaces/option';
 
 /* NGX-Bootstrap */
 import { BsDropdownConfig } from 'ngx-bootstrap/dropdown';
 
-/* BEFService */
-import { NgxBootstrapExpandedFeaturesService as BefService } from 'ngx-bootstrap-expanded-features';
+/* Services */
+import { SharedService } from 'src/app/shared/services/shared.service';
 @Component({
   selector: 'app-item',
   templateUrl: './item.component.html',
   styleUrls: ['./item.component.scss'],
   providers: [
-    BefService,
     {
       provide: BsDropdownConfig,
       useValue: { isAnimated: true, autoClose: true },
@@ -28,7 +27,7 @@ export class ItemComponent implements OnInit {
   @Input() options: optionInterface[] | string[] = [];
 
   @Output() changeTypeEvent = new EventEmitter<any>();
-  constructor(private _befService: BefService) {}
+  constructor(private _sharedService: SharedService) {}
 
   ngOnInit(): void {}
 
@@ -57,7 +56,7 @@ export class ItemComponent implements OnInit {
       this.checkIfOptionInterface(this.options)
     ) {
       if (thing === 'item') {
-        if (this.itemList.type >= 0) {
+        if (this.itemList.type >= 0 && !!this.options[this.itemList.type]) {
           type = this.options[this.itemList.type].color;
         } else {
           type = 'dark';
@@ -83,7 +82,6 @@ export class ItemComponent implements OnInit {
   }
 
   changeInfo(thing: string | number, choice: string) {
-    console.log(thing);
     thing = typeof thing === 'string' ? this.checkIfHas(thing) : thing;
     if (
       this.checkIfItemListInterface(this.itemList) &&
@@ -155,7 +153,11 @@ export class ItemComponent implements OnInit {
     this.inputActive = !this.inputActive;
   }
 
+  getHTML(type: string, size: string = '16'): string {
+    return this._sharedService.getHTML(type, size);
+  }
+
   cssCreate() {
-    this._befService.cssCreate();
+    this._sharedService.cssCreate();
   }
 }

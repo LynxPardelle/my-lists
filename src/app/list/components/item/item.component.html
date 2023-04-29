@@ -6,53 +6,75 @@
       ? checkForClass('bg', 'option')
       : {}
   "
-  class="bef p-3 m-3 d-flex flex-wrap flex-column flex-md-row justify-content-evenly align-items-center bef-rounded-1rem"
+  class="bef p-3 m-3 d-flex flex-wrap flex-column flex-md-row justify-content-between align-items-center bef-rounded-1rem bef-boxShadow-0px__0px__2px__dark"
 >
   <div
     *ngIf="inputActive === false"
-    [innerHTML]="
-      checkIfItemListInterface(itemList)
-        ? changeSomething(itemList.item)
-        : !checkIfItemListInterface(itemList)
-        ? itemList.option
-        : ('' | safeHtml)
-    "
-    class="m-0 bef bef-w-90per bef-w-md-70per text-center"
-    [ngClass]="{
-      'text-light':
-        (checkIfItemListInterface(itemList) &&
-          checkIfOptionInterface(options) &&
-          (itemList.type < 0 ||
-            options[itemList.type].color.includes('dark'))) ||
-        (!checkIfItemListInterface(itemList) &&
-          !checkIfOptionInterface(options) &&
-          options[getColorIndex(itemList.color)].includes('dark'))
-    }"
-    (click)="inputActiveChange()"
-  ></div>
-  <textarea
-    *ngIf="inputActive === true && checkIfItemListInterface(itemList)"
-    type="text"
-    name="item"
-    #item="ngModel"
-    [(ngModel)]="itemList.item"
-    class="form-control bef bef-w-90per bef-w-md-70per"
-    id="exampleFormControlInput1"
-    placeholder="{{ itemList.item }}"
-    (keyup.enter)="changeInfo(itemList.item, 'item')"
-  ></textarea>
-  <textarea
-    *ngIf="inputActive === true && !checkIfItemListInterface(itemList)"
-    type="text"
-    name="item"
-    #item="ngModel"
-    [(ngModel)]="itemList.option"
-    class="form-control bef bef-w-90per bef-w-md-70per"
-    id="exampleFormControlInput1"
-    placeholder="{{ itemList.option }}"
-    (keyup.enter)="changeInfo(itemList.option, 'option')"
-  ></textarea>
-
+    class="d-flex justify-content-between align-items-center bef bef-w-90per bef-w-md-70per"
+  >
+    <div
+      [innerHTML]="
+        checkIfItemListInterface(itemList)
+          ? (changeSomething(itemList.item) | safeHtml)
+          : !checkIfItemListInterface(itemList)
+          ? (itemList.option | safeHtml)
+          : ('' | safeHtml)
+      "
+      class="m-0 bef bef-w-calcSD100per__MIN__50pxED text-center"
+      [ngClass]="{
+        'text-light':
+          (checkIfItemListInterface(itemList) &&
+            checkIfOptionInterface(options) &&
+            (itemList.type < 0 ||
+              (!!options[itemList.type] &&
+                options[itemList.type].color.includes('dark')))) ||
+          (!checkIfItemListInterface(itemList) &&
+            !checkIfOptionInterface(options) &&
+            options[getColorIndex(itemList.color)].includes('dark'))
+      }"
+    ></div>
+    <button
+      (click)="inputActiveChange()"
+      class="btn btn-light text-dark mx-2 bef bef-rounded-100px bef-boxShadow-0px__0px__4px__dark"
+    >
+      <span [innerHTML]="getHTML('edit', '12') | safeHtml"></span>
+    </button>
+  </div>
+  <div
+    *ngIf="inputActive === true"
+    class="d-flex justify-content-between align-items-center bef bef-w-90per bef-w-md-70per"
+  >
+    <textarea
+      *ngIf="checkIfItemListInterface(itemList)"
+      type="text"
+      name="item"
+      #item="ngModel"
+      [(ngModel)]="itemList.item"
+      class="form-control bef bef-w-calcSD100per__MIN__50pxED"
+      id="exampleFormControlInput1"
+      placeholder="{{ itemList.item }}"
+    ></textarea>
+    <textarea
+      *ngIf="!checkIfItemListInterface(itemList)"
+      type="text"
+      name="item"
+      #item="ngModel"
+      [(ngModel)]="itemList.option"
+      class="form-control bef bef-w-calcSD100per__MIN__50pxED"
+      id="exampleFormControlInput1"
+      placeholder="{{ itemList.option }}"
+    ></textarea>
+    <button
+      (click)="
+        checkIfItemListInterface(itemList)
+          ? changeInfo(itemList.item, 'item')
+          : changeInfo(itemList.option, 'option')
+      "
+      class="btn btn-light text-dark mx-2 bef bef-rounded-100px bef-boxShadow-0px__0px__4px__dark"
+    >
+      <span [innerHTML]="getHTML('acept', '12') | safeHtml"></span>
+    </button>
+  </div>
   <div
     class="btn-group bef bef-mt-1_5rem bef-mt-md-0 bef bef-w-66per bef-w-md-20per"
     dropdown
@@ -78,7 +100,8 @@
             (checkIfItemListInterface(itemList) &&
               checkIfOptionInterface(options) &&
               (itemList.type < 0 ||
-                options[itemList.type].color.includes('dark'))) ||
+                (!!options[itemList.type] &&
+                  options[itemList.type].color.includes('dark')))) ||
             (!checkIfItemListInterface(itemList) &&
               !checkIfOptionInterface(options) &&
               options[getColorIndex(itemList.color)].includes('dark'))
@@ -110,7 +133,7 @@
               else elseYesChooseTemplate
             "
           >
-            {{ options[itemList.type].option }}
+            {{ !!options[itemList.type] ? options[itemList.type].option : "" }}
           </ng-container>
           <ng-template #elseYesChooseTemplate>
             {{
@@ -182,7 +205,5 @@
   </div>
 </div>
 <p *ngIf="inputActive === true" class="text-center">
-  Press "Enter" to Send.
-  <br />
   If the item is empty it will be deleted.
 </p>

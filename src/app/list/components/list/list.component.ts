@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 
 /* Interfaces */
-import itemListInterface from '../interfaces/itemList';
-import optionInterface from '../interfaces/option';
+import itemListInterface from '../../interfaces/itemList';
+import optionInterface from '../../interfaces/option';
 
+/* Services */
+import { SharedService } from 'src/app/shared/services/shared.service';
 /* BEFService */
 import { NgxBootstrapExpandedFeaturesService as BefService } from 'ngx-bootstrap-expanded-features';
-import { throwError } from 'rxjs';
+
 @Component({
   selector: 'app-list',
   templateUrl: './list.component.html',
@@ -16,38 +18,14 @@ import { throwError } from 'rxjs';
 export class ListComponent implements OnInit {
   public list: itemListInterface[] = [
     {
-      item: 'alumno 1',
+      item: 'item 1',
       type: 0,
-    },
-    {
-      item: 'alumno 2',
-      type: 1,
-    },
-    {
-      item: 'alumno 3',
-      type: 1,
-    },
-    {
-      item: 'alumno 4',
-      type: 1,
     },
   ];
   public options: optionInterface[] = [
     {
-      option: 'checked',
+      option: 'category 1',
       color: 'success',
-    },
-    {
-      option: 'not-checked',
-      color: 'secondary',
-    },
-    {
-      option: 'almost checked',
-      color: 'warning',
-    },
-    {
-      option: 'dont check',
-      color: 'danger',
     },
   ];
 
@@ -81,7 +59,7 @@ export class ListComponent implements OnInit {
 
   public newItem: itemListInterface = {
     item: '',
-    type: 1,
+    type: 0,
   };
 
   public newOption: optionInterface = {
@@ -97,7 +75,10 @@ export class ListComponent implements OnInit {
 
   public errorMessage: string = '';
 
-  constructor(private _befService: BefService) {
+  constructor(
+    private _befService: BefService,
+    private _sharedService: SharedService
+  ) {
     this._befService.cssCreate();
   }
 
@@ -138,12 +119,17 @@ export class ListComponent implements OnInit {
   }
 
   changeInfo(thing: string | number, option: string) {
-    if (option === 'type' && typeof thing === 'number') {
-      this.newItem.type = thing;
-    } else if (option === 'item' && typeof thing === 'string') {
-      this.newItem.item = thing;
-    } else if (option === 'color' && typeof thing === 'string') {
-      this.newOption.color = thing;
+    switch (true) {
+      case option === 'type':
+        if (typeof thing === 'number') {
+          this.newItem.type = thing;
+        }
+        break;
+      case ['item', 'color'].includes(option):
+        if (typeof thing === 'string') {
+          this.newOption.color = thing;
+        }
+        break;
     }
   }
 
@@ -152,7 +138,6 @@ export class ListComponent implements OnInit {
   }
 
   changeInfoO(change: any) {
-    console.log(change);
     if (change.item) {
       if (change.item.item !== '' && change.item.item !== '\n') {
         this.list[change.i] = change.item;
@@ -179,14 +164,14 @@ export class ListComponent implements OnInit {
       this.list.push(this.newItem);
       this.newItem = {
         item: '',
-        type: 1,
+        type: 0,
       };
       this.saveList();
     }
   }
 
   createNewOption() {
-    if (this.newOption.option !== '') {
+    if (this.newOption.option !== '' && this.newOption.color !== '') {
       this.options.push(this.newOption);
       this.newOption = {
         option: '',
@@ -200,9 +185,9 @@ export class ListComponent implements OnInit {
     let myLists = {
       list: this.list,
       options: this.options,
-      basicColors: this.basicColors,
     };
     localStorage.setItem('MyLists', JSON.stringify(myLists));
+    this.savedLists = JSON.stringify(myLists);
   }
 
   getList() {
@@ -212,7 +197,6 @@ export class ListComponent implements OnInit {
       if (myLists !== undefined) {
         this.list = myLists.list;
         this.options = myLists.options;
-        this.basicColors = myLists.basicColors;
         this.savedLists = JSON.stringify(myLists);
       }
     }
@@ -225,38 +209,54 @@ export class ListComponent implements OnInit {
         myLists = JSON.parse(myLists);
         console.log(myLists.list);
         console.log(myLists.options);
-        console.log(myLists.basicColors);
+        this.errorMessage = '';
+        if (myLists === undefined) throw new Error('There is no lists.');
         if (
-          myLists !== undefined &&
           myLists.list &&
-          myLists.list[0] &&
-          myLists.list[0].item &&
-          typeof myLists.list[0].item === 'string' &&
-          myLists.list[0].type &&
-          typeof myLists.list[0].type === 'number' &&
-          myLists.options &&
-          myLists.options[0] &&
-          myLists.options[0].option &&
-          typeof myLists.options[0].option === 'string' &&
-          myLists.options[0].color &&
-          typeof myLists.options[0].color === 'string' &&
-          myLists.basicColors &&
-          myLists.basicColors[0]
+          myLists.list.every(
+            (list: itemListInterface) =>
+              !!list.item &&
+              typeof list.item === 'string' &&
+              typeof list.type !== 'undefined' &&
+              typeof list.type === 'number'
+          )
         ) {
           this.list = myLists.list;
-          this.options = myLists.options;
-          this.basicColors = myLists.basicColors;
-          this.savedLists = JSON.stringify(myLists);
-          this.saveList();
-          this.errorMessage = 'Data retrieved successfully';
         } else {
-          throw new Error('Error de JSON parse');
+          this.errorMessage +=
+            'Error in the list, data corrupted, check the information in the input.';
         }
+        if (
+          myLists.options &&
+          myLists.options.every(
+            (option: optionInterface) =>
+              !!option.option &&
+              typeof option.option === 'string' &&
+              !!option.color &&
+              typeof option.color === 'string'
+          )
+        ) {
+          this.options = myLists.options;
+        } else {
+          this.errorMessage +=
+            'Error in the options, data corrupted, check the information in the input.';
+        }
+        this.savedLists = JSON.stringify(myLists);
+        this.saveList();
+        this.errorMessage =
+          'Data retrieved successfully.' +
+          (this.errorMessage !== ''
+            ? 'Except for the next errors:' + this.errorMessage
+            : '');
       } catch (error) {
-        console.log(error);
+        console.error(error);
         this.errorMessage =
           'No se ha podido importar la lista, revisa los datos porfavor.';
       }
     }
+  }
+
+  getHTML(type: string, size: string = '16'): string {
+    return this._sharedService.getHTML(type, size);
   }
 }

@@ -1,50 +1,25 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+/* Modules */
 import { AppRoutingModule } from './app-routing.module';
-
-/* BefService */
-import { NgxBootstrapExpandedFeaturesService as BefService } from 'ngx-bootstrap-expanded-features';
-
-/* NGX-Bootstrap */
-import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
-import { TooltipModule } from 'ngx-bootstrap/tooltip';
+import { SharedModule } from './shared/shared.module';
+import { ListModule } from './list/list.module';
 
 /* Components */
 import { AppComponent } from './app.component';
-import { ListComponent } from './components/list/list.component';
-import { ItemComponent } from './components/item/item.component';
-
-/* Directives */
-import { NgInitDirective } from './directives/ng-init.directive';
-
-/* Pipes */
-import { SafeHtmlPipe } from './pipes/safe-html';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    ListComponent,
-    ItemComponent,
-
-    /* Directives */
-    NgInitDirective,
-
-    /* Pipes */
-    SafeHtmlPipe,
-  ],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    FormsModule,
-    ReactiveFormsModule,
     BrowserAnimationsModule,
-    BsDropdownModule.forRoot(),
-    TooltipModule.forRoot(),
+    SharedModule,
+    ListModule,
   ],
-  providers: [BefService],
+  providers: [],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
