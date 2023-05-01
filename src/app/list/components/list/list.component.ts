@@ -84,6 +84,9 @@ export class ListComponent implements OnInit {
 
   ngOnInit(): void {
     this.getList();
+    this.cssCreate();
+    let _befColors: { [key: string]: string } = this._befService.getColors();
+    this.basicColors = Object.keys(_befColors);
   }
 
   getColorIndex(color: string) {
@@ -134,7 +137,7 @@ export class ListComponent implements OnInit {
   }
 
   cssCreate() {
-    this._befService.cssCreate();
+    this._sharedService.cssCreate();
   }
 
   changeInfoO(change: any) {
@@ -179,6 +182,7 @@ export class ListComponent implements OnInit {
       };
       this.saveList();
     }
+    this.cssCreate();
   }
 
   saveList() {
@@ -200,6 +204,7 @@ export class ListComponent implements OnInit {
         this.savedLists = JSON.stringify(myLists);
       }
     }
+    this.cssCreate();
   }
 
   restoreLists() {
@@ -254,6 +259,7 @@ export class ListComponent implements OnInit {
           'No se ha podido importar la lista, revisa los datos porfavor.';
       }
     }
+    this.cssCreate();
   }
 
   getHTML(type: string, size: string = '16'): string {

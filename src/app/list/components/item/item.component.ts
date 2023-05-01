@@ -29,7 +29,9 @@ export class ItemComponent implements OnInit {
   @Output() changeTypeEvent = new EventEmitter<any>();
   constructor(private _sharedService: SharedService) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.cssCreate();
+  }
 
   checkIfItemListInterface(
     itemList: itemListInterface | optionInterface
@@ -78,6 +80,7 @@ export class ItemComponent implements OnInit {
     bgType = JSON.parse(
       JSON.stringify(bgType).replace('PROPERTY', property).replace('TYPE', type)
     );
+    this.cssCreate();
     return bgType;
   }
 
@@ -118,6 +121,7 @@ export class ItemComponent implements OnInit {
         option: { option: option, color: color },
       });
     }
+    this.cssCreate();
   }
 
   checkIfHas(thing: string, checker: string = '\n', side: string = 'end') {
@@ -146,6 +150,7 @@ export class ItemComponent implements OnInit {
     toChange: string = '<br />'
   ) {
     thing = thing.replace(/\n/g, '<br />');
+    this.cssCreate();
     return thing;
   }
 
