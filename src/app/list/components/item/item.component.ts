@@ -76,11 +76,10 @@ export class ItemComponent implements OnInit {
         type = this.options[Number.parseInt(thing.split('_')[1])];
       }
     }
-    let bgType = { 'bef-PROPERTY-TYPE__OPA__0_33': true };
-    bgType = JSON.parse(
-      JSON.stringify(bgType).replace('PROPERTY', property).replace('TYPE', type)
-    );
-    this.cssCreate();
+    let bgType: any = {};
+    if (!!type) {
+      bgType['bef-' + property + '-' + type + '__OPA__0_33'] = true;
+    }
     return bgType;
   }
 
@@ -150,7 +149,6 @@ export class ItemComponent implements OnInit {
     toChange: string = '<br />'
   ) {
     thing = thing.replace(/\n/g, '<br />');
-    this.cssCreate();
     return thing;
   }
 

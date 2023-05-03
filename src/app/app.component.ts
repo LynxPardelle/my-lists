@@ -11,7 +11,11 @@ export class AppComponent implements OnInit {
   constructor(
     private _sharedService: SharedService,
     private _befService: NgxBootstrapExpandedFeaturesService
-  ) {}
+  ) {
+    this._befService.changeDebugOption();
+    // this._befService.changeUseTimerOption();
+    this._befService.setTimeBetweenReCreate(500);
+  }
 
   ngOnInit() {
     this.cssCreate();

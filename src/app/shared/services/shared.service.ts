@@ -32,7 +32,7 @@ export class SharedService {
   }
 
   cssCreate() {
-    this._befService.doCssCreate();
+    this._befService.cssCreate();
   }
 
   getStackTrace() {

@@ -166,7 +166,7 @@
       >
         <button
           [ngClass]="checkForClass('btn', 'color_' + color, 'type')"
-          class="btn bef w-100"
+          class="btn bef bef-btn-{{color}} w-100"
           (click)="changeInfo(color, 'color')"
         >
           <span [ngClass]="{ 'text-dark': !color.includes('dark') }">

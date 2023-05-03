@@ -78,9 +78,7 @@ export class ListComponent implements OnInit {
   constructor(
     private _befService: BefService,
     private _sharedService: SharedService
-  ) {
-    this._befService.cssCreate();
-  }
+  ) {}
 
   ngOnInit(): void {
     this.getList();
@@ -109,15 +107,16 @@ export class ListComponent implements OnInit {
           type = 'dark';
         }
       } else if (thing.includes('color')) {
-        type = this.basicColors[this.getColorIndex(thing.split('_')[1])];
+        type = !!this.basicColors.indexOf(thing.split('_')[1])
+          ? this.basicColors[this.basicColors.indexOf(thing.split('_')[1])]
+          : '';
       }
     }
 
-    let bgType = { 'bef-PROPERTY-TYPE__OPA__0_33': true };
-    bgType = JSON.parse(
-      JSON.stringify(bgType).replace('PROPERTY', property).replace('TYPE', type)
-    );
-    this.cssCreate();
+    let bgType: any = {};
+    if (!!type) {
+      bgType['bef-' + property + '-' + type + '__OPA__0_33'] = true;
+    }
     return bgType;
   }
 
@@ -126,11 +125,17 @@ export class ListComponent implements OnInit {
       case option === 'type':
         if (typeof thing === 'number') {
           this.newItem.type = thing;
+          setTimeout(() => {
+            this.cssCreate();
+          }, 10);
         }
         break;
       case ['item', 'color'].includes(option):
         if (typeof thing === 'string') {
           this.newOption.color = thing;
+          setTimeout(() => {
+            this.cssCreate();
+          }, 10);
         }
         break;
     }
